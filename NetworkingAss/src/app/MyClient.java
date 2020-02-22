@@ -13,7 +13,7 @@ public class MyClient {
         BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
         BufferedReader fromUser=new BufferedReader(new InputStreamReader(System.in));
         PrintWriter out=new PrintWriter(s.getOutputStream(),true);
-
+        System.out.println("Type name to see a random name. Or Quit.");
         while(true){
             String userIn=fromUser.readLine();
             if(userIn.equals("quit")){break;}

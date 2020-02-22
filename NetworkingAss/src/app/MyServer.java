@@ -19,7 +19,7 @@ public class MyServer {
                     out.println(getRandom());
                 }
                 else{
-                    out.println("Error");
+                    out.println("Error. Type name to print out a random name. Or quit to quit the app.");
                 }
             }
         }finally{

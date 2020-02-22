@@ -2,17 +2,17 @@ package app;
 import java.io.*;  
 import java.net.*;  
 import java.util.*;
+
 public class MyClient {  
+    private static final int SERVERPORT=6666;
+    private static final String SERVERIP="localhost";
     public static void main(String[] args) {  
         try{      
-        Socket s=new Socket("localhost",6666);  
-        DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
-        Scanner in=new Scanner(System.in);
-        System.out.println("Write a message");
-        String sIn =in.nextLine();
-        dout.writeUTF(sIn);  
-        dout.flush();  
-        dout.close();  
+        Socket s=new Socket(SERVERIP,SERVERPORT);  
+        BufferedReader in=new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String serverResponse=in.readLine();
+
+            System.out.println(serverResponse);
         s.close();  
         }
         catch(Exception e){System.out.println(e);}  

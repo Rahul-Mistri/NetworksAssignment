@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-
 public class MyClient {
 
     // Setting the constant connection port
@@ -38,42 +37,55 @@ public class MyClient {
             BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in));
             // PrintWriter communicationOut is used to send messages to the server.
             PrintWriter communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
-            //System.out.println(menu);
-            
-            
+            // System.out.println(menu);
 
-            // continous loop
-            String userInput="";
-            Boolean flag = true;
-            while (flag) {
-                // user input taken in.
-                String cLine = communicationIn.readLine();
-                System.out.println(cLine);
-                while (!(cLine.equals(""))) {
-                
-                    //System.out.println(cLine != null);
-                    
+            // authentication
+            // username
+            System.out.print(communicationIn.readLine());
+            String userName;
+            userName = fromUser.readLine();
+            communicationOut.println(userName);
+            // password
+            System.out.print(communicationIn.readLine());
+            String password;
+            password = fromUser.readLine();
+            communicationOut.println(password);
+            String state = communicationIn.readLine();
+            if (state.equals("success")) {
+                // continous loop
+                String userInput = "";
+                Boolean flag = true;
+                while (flag) {
 
-                    cLine = communicationIn.readLine();
+                    // user input taken in .
+                    String cLine = communicationIn.readLine();
                     System.out.println(cLine);
-                    
-                    //System.out.println(menu);
-                    
-                    
+                    while (!(cLine.equals(""))) {
+
+                        // System.out.println(cLine != null);
+
+                        cLine = communicationIn.readLine();
+                        System.out.println(cLine);
+
+                        // System.out.println(menu);
+
+                    }
+                    userInput = fromUser.readLine();
+
+                    // sending the request to the server.
+                    communicationOut.println(userInput);
+                    // receiving the reply from the server.
+                    if ((userInput.equals("4")) || (userInput.equals("QUIT"))) {
+                        System.out.println(communicationIn.readLine());
+                        flag = false;
+                    }
+
                 }
-                userInput = fromUser.readLine();
-                
-                
-                // sending the request to the server.
-                communicationOut.println(userInput);
-                // receiving the reply from the server.
-                if((userInput.equals("4"))||(userInput.equals("QUIT"))){
-                    System.out.println(communicationIn.readLine());
-                    flag=false;
-                }
-                
             }
-            
+
+            else {
+                System.out.println("Invalid User name and password \nExiting...");
+            }
             // closing the communication socket.
             connectionSocket.close();
 

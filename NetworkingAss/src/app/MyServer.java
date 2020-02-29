@@ -18,9 +18,8 @@ public class MyServer {
     private static ArrayList<MyClientHandler> myClients = new ArrayList<>();
     // thread executor pool
     private static ExecutorService pool = Executors.newFixedThreadPool(4);
-    //hashmap to store usernames and passwords
+    // hashmap to store usernames and passwords
     public static HashMap<String, String> usersAndPass;
-
 
     public static void main(String[] args) throws IOException {
         // establishes a connection on the connection port called
@@ -69,7 +68,7 @@ public class MyServer {
             Scanner sc = new Scanner(new FileReader("users.txt"));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
-                String temp[]=line.split(" ");
+                String temp[] = line.split(" ");
                 usersAndPass.put(temp[0], temp[1]);
             }
         } catch (Exception e) {

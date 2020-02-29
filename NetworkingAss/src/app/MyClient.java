@@ -42,11 +42,26 @@ public class MyClient {
             
             
 
+
+            //authentication
+            //username
+            System.out.print(communicationIn.readLine());
+            String userName;
+            userName = fromUser.readLine();
+            communicationOut.println(userName);
+            //password
+            System.out.print(communicationIn.readLine());
+            String password;
+            password = fromUser.readLine();
+            communicationOut.println(password);
+            String state=communicationIn.readLine();
+            if(state.equals("success")){
             // continous loop
             String userInput="";
             Boolean flag = true;
             while (flag) {
-                // user input taken in.
+                
+                // user input taken in .
                 String cLine = communicationIn.readLine();
                 System.out.println(cLine);
                 while (!(cLine.equals(""))) {
@@ -73,7 +88,11 @@ public class MyClient {
                 }
                 
             }
-            
+        }
+        
+          else{
+              System.out.println("Invalid User name and password \nExiting...");
+          }  
             // closing the communication socket.
             connectionSocket.close();
 

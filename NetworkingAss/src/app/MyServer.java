@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.HashMap;
 
 public class MyServer {
     // Setting the constant connection port
@@ -17,11 +18,19 @@ public class MyServer {
     private static ArrayList<MyClientHandler> myClients = new ArrayList<>();
     // thread executor pool
     private static ExecutorService pool = Executors.newFixedThreadPool(4);
+    //hashmap to store usernames and passwords
+    public static HashMap<String, String> usersAndPass;
+
 
     public static void main(String[] args) throws IOException {
         // establishes a connection on the connection port called
         // connectionServerSocket.
+        storeUsersAndPassword();
+
         ServerSocket connectionServerSocket = new ServerSocket(PORT);
+
+        //
+
         // continus loop
         while (true) {
             // connection socket is listening-- havent started communicating yet.
@@ -52,4 +61,21 @@ public class MyServer {
         comPort += 1;
         return comPort;
     }
+
+    // reading usersAndPasswords.txt
+    public static void storeUsersAndPassword() {
+        try {
+            usersAndPass = new HashMap<String, String>();
+            Scanner sc = new Scanner(new FileReader("users.txt"));
+            while (sc.hasNext()) {
+                String line = sc.nextLine();
+                String temp[]=line.split(" ");
+                usersAndPass.put(temp[0], temp[1]);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+        }
+    }
+
 }

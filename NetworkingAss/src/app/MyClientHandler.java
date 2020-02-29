@@ -39,6 +39,23 @@ public class MyClientHandler implements Runnable {
             // communicationOut is a printWriter used to send any information to the client
             // through the unique port.
             communicationOut = new PrintWriter(myClient.getOutputStream(), true);
+
+            //Authentication
+            //user authentication
+            String userNameTxt="Enter Username: ";
+            communicationOut.println(userNameTxt);
+            String uName = communicationIn.readLine();
+            String passwordTxt="Enter Password: ";
+            communicationOut.println(passwordTxt);
+            String password = communicationIn.readLine();
+            String checkPass="";
+            for (String i : MyServer.usersAndPass.keySet()) {
+                if(i.equals(uName)){
+                    checkPass=MyServer.usersAndPass.get(i);
+                }
+            }
+            if(checkPass.equals(password)){
+            communicationOut.println("success");
             // continous loop
             boolean flag = true;
             while (flag) {
@@ -72,6 +89,11 @@ public class MyClientHandler implements Runnable {
                 }
 
             }
+        }
+        else{
+            System.out.println("Invalid user name and password. Please try again.");
+            communicationOut.println("fail");
+        }
         } catch (IOException e) {
 
         } finally {

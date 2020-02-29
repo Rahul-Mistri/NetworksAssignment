@@ -26,6 +26,7 @@ public class MyServer {
         while (true) {
             // connection socket is listening-- havent started communicating yet.
             Socket connectionSocket = connectionServerSocket.accept();
+
             // creates a clientHandler for the current client passing in the
             // connectionSocket as constructor
             MyClientHandler myClientThread = new MyClientHandler(connectionSocket);
@@ -40,7 +41,9 @@ public class MyServer {
     // TEMPORARY get random method for now
     public static String getRandom() {
         String name = names[(int) (Math.random() * names.length)];
+
         return name;
+
     }
 
     // synchronized method to assign a unique port number for every client that

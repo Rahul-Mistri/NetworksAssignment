@@ -24,31 +24,53 @@ public class MyClientHandler implements Runnable {
         try {
             // communicationPort is the unique port that the server and client will
             // communicate through.
-            int communicationPort = MyServer.getComPort();
+           // int communicationPort = MyServer.getComPort();
             // the printerWriter connectionOut is used to send the client its unique
             // communicationPort number.
-            connectionOut.println(communicationPort);
+           // connectionOut.println(communicationPort);
             // establishess a new connection with the client using its unique PORT.
-            ServerSocket communicationServerSocket = new ServerSocket(communicationPort);
+           // ServerSocket communicationServerSocket = new ServerSocket(communicationPort);
             // communicationSocket waits for any response from the client.
-            Socket communicationSocket = communicationServerSocket.accept();
+          //  Socket communicationSocket = communicationServerSocket.accept();
             // communicationIn is a bufferedReader used to receive any information sent by
             // the client on the unique Port.
-            communicationIn = new BufferedReader(new InputStreamReader(communicationSocket.getInputStream()));
+
+            communicationIn = new BufferedReader(new InputStreamReader(myClient.getInputStream()));
             // communicationOut is a printWriter used to send any information to the client
             // through the unique port.
-            communicationOut = new PrintWriter(communicationSocket.getOutputStream(), true);
+            communicationOut = new PrintWriter(myClient.getOutputStream(), true);
             // continous loop
-            while (true) {
+            boolean flag = true;
+            while (flag) {
                 // reads what the client sent.
+                    String  menu="1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
+                    communicationOut.println(menu);
                 String request = communicationIn.readLine();
+
                 // compare statement of what the client entered
-                if (request.contains("name")) {
-                    // TEMPORARY-- gets random name.
-                    communicationOut.println(MyServer.getRandom());
-                } else {
-                    communicationOut.println("Error. Type name to print out a random name. Or quit to quit the app.");
+                switch (request) {
+                    case "1":
+                    case "UPLOAD":
+                        System.out.println("Told me to upload");
+                        break;
+                    case "2":
+                    case "DOWNLOAD":
+                        System.out.println("Told me to download");
+                        break;
+                    case "3":
+                    case "QUERY":
+                        System.out.println("Told me to QUERY");
+                        break;
+                    case "4":
+                    case "QUIT":
+                        System.out.println("Told me to QUIT");
+                        communicationOut.println("connection on port #"+myClient.getPort()+" is closed");
+                        flag=false;
+                        break;
+                    default:
+                        break;
                 }
+
             }
         } catch (IOException e) {
 
@@ -57,6 +79,7 @@ public class MyClientHandler implements Runnable {
                 // closing bufferedReader and printWriter
                 communicationIn.close();
                 communicationOut.close();
+                System.out.println("Closed stuff");
             } catch (IOException e) {
             }
         }

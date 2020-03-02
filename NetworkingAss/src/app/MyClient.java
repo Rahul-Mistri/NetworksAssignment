@@ -2,6 +2,8 @@ package app;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class MyClient {
@@ -9,8 +11,8 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
-    // private static final String SERVERIP = "196.47.241.137";
-    private static final String SERVERIP = "localhost";
+    private static final String SERVERIP = "196.47.241.137";
+    // private static final String SERVERIP = "localhost";
      
 
     public static void main(String[] args) {
@@ -232,5 +234,17 @@ public class MyClient {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+
+    public File getFile(String filename)
+    {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subdirectory = "NetworkingAss";
+        String subDir_And_Filename =  subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        File transferfile = filepath.toFile();
+        return transferfile;
     }
 }

@@ -25,18 +25,6 @@ public class MyClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            // communicationPort is the unique port that the server and client will
-            // communicate through.
-            // int communicationPort = MyServer.getComPort();
-            // the printerWriter connectionOut is used to send the client its unique
-            // communicationPort number.
-            // connectionOut.println(communicationPort);
-            // establishess a new connection with the client using its unique PORT.
-            // ServerSocket communicationServerSocket = new ServerSocket(communicationPort);
-            // communicationSocket waits for any response from the client.
-            // Socket communicationSocket = communicationServerSocket.accept();
-            // communicationIn is a bufferedReader used to receive any information sent by
-            // the client on the unique Port.
             os = myClient.getOutputStream();
             connectionOut = new PrintWriter(os, true);
 
@@ -44,40 +32,60 @@ public class MyClientHandler implements Runnable {
             // communicationOut is a printWriter used to send any information to the client
             // through the unique port.
             communicationOut = new PrintWriter(myClient.getOutputStream(), true);
-            // continous loop
-            boolean flag = true;
-            while (flag) {
-                // reads what the client sent.
-                System.out.println("Top of the menu");
-                String menu = "1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
-                communicationOut.println(menu);
-                String request = communicationIn.readLine();
 
-                // compare statement of what the client entered
-                switch (request) {
-                    case "1":
-                    case "UPLOAD":
-                        upload_query();
-                        break;
-                    case "2":
-                    case "DOWNLOAD":
-                        download_query();
-                        System.out.println("server switch after download");
-                        break;
-                    case "3":
-                    case "QUERY":
-                        System.out.println("Told me to QUERY");
-                        break;
-                    case "4":
-                    case "QUIT":
-                        System.out.println("Told me to QUIT");
-                        communicationOut.println("connection on port #" + myClient.getPort() + " is closed");
-                        flag = false;
-                        break;
-                    default:
-                        break;
+            // Authentication
+            // user authentication
+            String userNameTxt = "Enter Username: ";
+            communicationOut.println(userNameTxt);
+            String uName = communicationIn.readLine();
+            String passwordTxt = "Enter Password: ";
+            communicationOut.println(passwordTxt);
+            String password = communicationIn.readLine();
+            String checkPass = "";
+            for (String i : MyServer.usersAndPass.keySet()) {
+                if (i.equals(uName)) {
+                    checkPass = MyServer.usersAndPass.get(i);
                 }
+            }
+            if (checkPass.equals(password)) {
+                communicationOut.println("success");
+                // continous loop
+                boolean flag = true;
+                while (flag) {
+                    // reads what the client sent.
+                    System.out.println("Top of the menu");
+                    String menu = "1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
+                    communicationOut.println(menu);
+                    String request = communicationIn.readLine();
 
+                    // compare statement of what the client entered
+                    switch (request) {
+                        case "1":
+                        case "UPLOAD":
+                            upload_query();
+                            break;
+                        case "2":
+                        case "DOWNLOAD":
+                            download_query();
+                            System.out.println("server switch after download");
+                            break;
+                        case "3":
+                        case "QUERY":
+                            System.out.println("Told me to QUERY");
+                            break;
+                        case "4":
+                        case "QUIT":
+                            System.out.println("Told me to QUIT");
+                            communicationOut.println("connection on port #" + myClient.getPort() + " is closed");
+                            flag = false;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else {
+                System.out.println("Invalid user name and password. Please try again.");
+                communicationOut.println("fail");
             }
         } catch (IOException e) {
 
@@ -93,6 +101,32 @@ public class MyClientHandler implements Runnable {
         }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void upload_query() {
 
@@ -157,7 +191,7 @@ public class MyClientHandler implements Runnable {
 
             // Retrieve requested_file in servers system
             System.out.println("The servers directory path is " + System.getProperty("user.dir"));
-            //String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
+            // String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
             File transferFile = getFile(filename);
 
             // Send file or not found response
@@ -180,8 +214,7 @@ public class MyClientHandler implements Runnable {
                 bin.read(bytearray, 0, bytearray.length);
                 try {
                     Thread.sleep(1000);
-                    } 
-                catch (InterruptedException ex) {
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
                 System.out.println("Sending Files...");
@@ -206,16 +239,14 @@ public class MyClientHandler implements Runnable {
 
     }
 
-    public File getFile(String filename)
-    {
+    public File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
         String subdirectory = "NetworkingAss";
-        String subDir_And_Filename =  subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;
     }
-
 
 }

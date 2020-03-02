@@ -11,37 +11,49 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
-    private static final String SERVERIP = "196.47.241.137";
-    // private static final String SERVERIP = "localhost";
-     
+    // private static final String SERVERIP = "196.47.241.137";
+    private static final String SERVERIP = "localhost";
 
     public static void main(String[] args) {
         try {
             // connectionSocket is making a connection request to the server using the
             // serversIp and the port 6666.
             Socket connectionSocket = new Socket(SERVERIP, SERVERPORT);
-            // bufferedReader connectionIn is used to receive a unique PORT number from the
-            // server such that the server and the client can talk through this port.
-            // serverResponseWithPortNumber takes in the unique communication port number as
-            // a string.
-            // String serverResponseWithPortNumber = connectionIn.readLine();
-            // communicationPort is the unique communication port number as a Integer.
-            // int communicationPort = Integer.parseInt(serverResponseWithPortNumber);
-            // System.out.println("Communicating through PORT no: " + communicationPort);
-            // closing the connectionSocket as it is not needed anymore
-            // connectionSocket.close();
-            // communicationSocket is making a connection request to the server using the
-            // serversIp and the new communicationPort received.
-            // Socket communicationSocket = new Socket(SERVERIP, communicationPort);
-            // bufferedReader communicationIn is used to receive information from server.
-            BufferedReader communicationIn;
-            BufferedReader fromUser;
-            PrintWriter communicationOut;
+
+            BufferedReader communicationIn= new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));;
+            BufferedReader fromUser= new BufferedReader(new InputStreamReader(System.in));;
+            PrintWriter communicationOut= new PrintWriter(connectionSocket.getOutputStream(), true);;
             OutputStream os = connectionSocket.getOutputStream();
 
             // TEMPORARY BufferedReader fromUser will get an input from the user.
             // PrintWriter communicationOut is used to send messages to the server.
+            
+           
+            /////////////START INCOMING
+            communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
             // System.out.println(menu);
+
+            // authentication
+            // username
+            System.out.print(communicationIn.readLine());
+            String userName;
+            userName = fromUser.readLine();
+            communicationOut.println(userName);
+            // password
+            System.out.print(communicationIn.readLine());
+            String password;
+            password = fromUser.readLine();
+            communicationOut.println(password);
+            String state = communicationIn.readLine();
+            if (state.equals("success")) {
+                // continous loop
+
+                
+
+
+
+
+                 //BEGINNIING ORIGINAL
 
             // continous loop
             String userInput = "";
@@ -57,10 +69,15 @@ public class MyClient {
                 System.out.println(cLine);
 
                 while (!(cLine.equals(""))) {
+                    //END ORIGINAL
 
+                    
+                    //END INCOMING////////////////////
+
+                    // user input taken in .
                     cLine = communicationIn.readLine();
                     System.out.println(cLine);
-
+                    
                 }
 
                 // Taking user input
@@ -94,75 +111,79 @@ public class MyClient {
                 }
 
             }
+            
+           
 
-            // closing the communication socket.
-            connectionSocket.close();
-
-        } catch (Exception e) {
-            // System.out.println(e);
+        } else {
+            System.out.println("Invalid User name and password \nExiting...");
         }
+        // closing the communication socket.
+        connectionSocket.close();
+        
+
+        
+        
     }
+    catch (Exception e) {
+        // System.out.println(e);
+    }
+}
 
     private static void upload(BufferedReader communicationIn, PrintWriter communicationOut, BufferedReader fromUser,
             OutputStream os) {
 
         try {
-            //Ask for upload file on the client side
+            // Ask for upload file on the client side
             System.out.println("Enter the filename");
             String filename = fromUser.readLine();
 
-            //Find file in the users loal directory
+            // Find file in the users loal directory
             String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
             File transferFile = new File(directory_path + filename);
-            System.out.println("File to be uploaded"+directory_path+filename);
+            System.out.println("File to be uploaded" + directory_path + filename);
 
-            //File does not exist
-            if(!transferFile.exists())
-            {
-                //Display message to the user
+            // File does not exist
+            if (!transferFile.exists()) {
+                // Display message to the user
                 System.out.println("Error 404");
 
-                //Notify message to the server
+                // Notify message to the server
                 communicationOut.println("Error 404");
             }
 
-            //File exists
-            //Upload toserver
-            else
-            {
-                //Send filename to the server
+            // File exists
+            // Upload toserver
+            else {
+                // Send filename to the server
                 communicationOut.println(filename);
-                //Sedn file length to the server
+                // Sedn file length to the server
                 communicationOut.println(transferFile.length());
-                
-                //Transform file data into bytearray
+
+                // Transform file data into bytearray
                 byte[] bytearray = new byte[(int) transferFile.length()];
                 FileInputStream fin = new FileInputStream(transferFile);
                 BufferedInputStream bin = new BufferedInputStream(fin);
 
                 try {
                     Thread.sleep(1000);
-                    } 
-                catch (InterruptedException ex) {
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
-                
+
                 bin.read(bytearray, 0, bytearray.length);
                 System.out.println("Sending Files...");
-                
-                //Write results to the server
+
+                // Write results to the server
                 os.write(bytearray, 0, bytearray.length);
                 os.flush();
-                
-                //Requires acknowledgment of client to synchronize their processes
+
+                // Requires acknowledgment of client to synchronize their processes
                 communicationIn.readLine();
                 System.out.println("done");
 
-                //Starts to send the file content
+                // Starts to send the file content
 
             }
-
-
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -236,13 +257,11 @@ public class MyClient {
         }
     }
 
-
-    public File getFile(String filename)
-    {
+    public File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
         String subdirectory = "NetworkingAss";
-        String subDir_And_Filename =  subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;

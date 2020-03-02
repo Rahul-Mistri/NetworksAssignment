@@ -2,6 +2,8 @@ package app;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class MyClientHandler implements Runnable {
@@ -94,61 +96,54 @@ public class MyClientHandler implements Runnable {
 
     private void upload_query() {
 
-        
         try {
-            //Determines whether user entered existent file
+            // Determines whether user entered existent file
             String client_file_result = communicationIn.readLine();
-            //Execute upload if the file is valid
-            if (!client_file_result.equalsIgnoreCase("Error 404"))
-            {
-                //Name of the file to be uploaded
+            // Execute upload if the file is valid
+            if (!client_file_result.equalsIgnoreCase("Error 404")) {
+                // Name of the file to be uploaded
                 String filename = client_file_result;
-                
-                 // Setup to read the bytestream
-                 int filesize = Integer.parseInt(communicationIn.readLine());
-                 int bytesRead;
-                 int currentTot = 0;
-                 byte[] bytearray = new byte[filesize];
- 
-                 // Variables for server input and stream objects that write to a local file
-                 InputStream is = myClient.getInputStream();
-                 FileOutputStream fos = new FileOutputStream("Server_Copy_Of_"+filename);
-                 BufferedOutputStream bos = new BufferedOutputStream(fos);
- 
-                 // Read the first byte stream
-                 bytesRead = is.read(bytearray, 0, bytearray.length);
-                 currentTot = bytesRead;
- 
-                 // Read the server's remaining byte streams in chunks
-                 do {
-                     // Reads the bytestream and adds it to the byteArray
-                     bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
-                     // Updates the remaining bytes to be read
-                     if (bytesRead > 0)
-                         currentTot += bytesRead;
-                 } while (bytesRead > 0);
- 
-                 // Write the locally stored byte streams into client file
-                 bos.write(bytearray, 0, currentTot);
-                 bos.flush();
- 
-                 // Close the filewriting outputstream object
-                 bos.close();
- 
-                 // Send acknowledgement to server to synchronize their progress
-                 communicationOut.println("Server has downloaded file");                
-                
 
+                // Setup to read the bytestream
+                int filesize = Integer.parseInt(communicationIn.readLine());
+                int bytesRead;
+                int currentTot = 0;
+                byte[] bytearray = new byte[filesize];
+
+                // Variables for server input and stream objects that write to a local file
+                InputStream is = myClient.getInputStream();
+                FileOutputStream fos = new FileOutputStream("Server_Copy_Of_" + filename);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                // Read the first byte stream
+                bytesRead = is.read(bytearray, 0, bytearray.length);
+                currentTot = bytesRead;
+
+                // Read the server's remaining byte streams in chunks
+                do {
+                    // Reads the bytestream and adds it to the byteArray
+                    bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
+                    // Updates the remaining bytes to be read
+                    if (bytesRead > 0)
+                        currentTot += bytesRead;
+                } while (bytesRead > 0);
+
+                // Write the locally stored byte streams into client file
+                bos.write(bytearray, 0, currentTot);
+                bos.flush();
+
+                // Close the filewriting outputstream object
+                bos.close();
+
+                // Send acknowledgement to server to synchronize their progress
+                communicationOut.println("Server has downloaded file");
 
             }
-
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-
 
     }
 
@@ -162,8 +157,8 @@ public class MyClientHandler implements Runnable {
 
             // Retrieve requested_file in servers system
             System.out.println("The servers directory path is " + System.getProperty("user.dir"));
-            String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
-            File transferFile = new File(directory_path + filename);
+            //String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
+            File transferFile = getFile(filename);
 
             // Send file or not found response
 
@@ -174,7 +169,7 @@ public class MyClientHandler implements Runnable {
             // File exists
             // Send back to user
             else {
-                
+
                 communicationOut.println("Ok(200)");
 
                 // Sending file to client
@@ -183,17 +178,23 @@ public class MyClientHandler implements Runnable {
                 FileInputStream fin = new FileInputStream(transferFile);
                 BufferedInputStream bin = new BufferedInputStream(fin);
                 bin.read(bytearray, 0, bytearray.length);
+                try {
+                    Thread.sleep(1000);
+                    } 
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
                 System.out.println("Sending Files...");
                 os.write(bytearray, 0, bytearray.length);
                 os.flush();
-                //os.close();
-                
-                //Requires acknowledgment of client to synchronize their processes
+                // os.close();
+
+                // Requires acknowledgment of client to synchronize their processes
                 communicationIn.readLine();
                 System.out.println("done");
 
-                //Acknowledgment of user
-                
+                // Acknowledgment of user
+
             }
 
         }
@@ -204,5 +205,17 @@ public class MyClientHandler implements Runnable {
         }
 
     }
+
+    public File getFile(String filename)
+    {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subdirectory = "NetworkingAss";
+        String subDir_And_Filename =  subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        File transferfile = filepath.toFile();
+        return transferfile;
+    }
+
 
 }

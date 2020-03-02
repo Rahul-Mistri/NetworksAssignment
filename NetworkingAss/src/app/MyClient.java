@@ -9,6 +9,7 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
+    // private static final String SERVERIP = "196.47.241.137";
     private static final String SERVERIP = "localhost";
      
 
@@ -111,6 +112,7 @@ public class MyClient {
             //Find file in the users loal directory
             String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
             File transferFile = new File(directory_path + filename);
+            System.out.println("File to be uploaded"+directory_path+filename);
 
             //File does not exist
             if(!transferFile.exists())
@@ -135,6 +137,14 @@ public class MyClient {
                 byte[] bytearray = new byte[(int) transferFile.length()];
                 FileInputStream fin = new FileInputStream(transferFile);
                 BufferedInputStream bin = new BufferedInputStream(fin);
+
+                try {
+                    Thread.sleep(1000);
+                    } 
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                
                 bin.read(bytearray, 0, bytearray.length);
                 System.out.println("Sending Files...");
                 

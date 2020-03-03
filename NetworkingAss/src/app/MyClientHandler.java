@@ -12,6 +12,7 @@ public class MyClientHandler implements Runnable {
     private PrintWriter communicationOut;
     private BufferedReader communicationIn;
     private OutputStream os;
+    private String myClientUname="";
 
     // constructor
     public MyClientHandler(Socket myClientSocket) throws IOException {
@@ -50,6 +51,7 @@ public class MyClientHandler implements Runnable {
             if (checkPass.equals(password)) {
                 communicationOut.println("success");
                 // continous loop
+                myClientUname=uName;
                 boolean flag = true;
                 while (flag) {
                     // reads what the client sent.
@@ -71,7 +73,8 @@ public class MyClientHandler implements Runnable {
                             break;
                         case "3":
                         case "QUERY":
-                            System.out.println("Told me to QUERY");
+                            query();
+                            //System.out.println("Told me to QUERY");
                             break;
                         case "4":
                         case "QUIT":
@@ -102,7 +105,12 @@ public class MyClientHandler implements Runnable {
 
     }
 
+    private void query(){
 
+
+        communicationOut.println(MyServer.toStringAll());
+
+    }
 
 
 
@@ -140,6 +148,13 @@ public class MyClientHandler implements Runnable {
 
                 // Setup to read the bytestream
                 int filesize = Integer.parseInt(communicationIn.readLine());
+                String password = communicationIn.readLine();
+                if (password.length()>0){
+                    MyServer.addToList(new FileObject(myClientUname, filename,password));
+                }
+                else{
+                    MyServer.addToList(new FileObject(myClientUname, filename));
+                }
                 int bytesRead;
                 int currentTot = 0;
                 byte[] bytearray = new byte[filesize];
@@ -200,34 +215,60 @@ public class MyClientHandler implements Runnable {
             if (!transferFile.exists()) {
                 communicationOut.println("Error 404");
             }
+            else{
+                communicationOut.println("Ok(200)");
+            
             // File exists
             // Send back to user
-            else {
 
-                communicationOut.println("Ok(200)");
 
-                // Sending file to client
-                communicationOut.println(transferFile.length());
-                byte[] bytearray = new byte[(int) transferFile.length()];
-                FileInputStream fin = new FileInputStream(transferFile);
-                BufferedInputStream bin = new BufferedInputStream(fin);
-                bin.read(bytearray, 0, bytearray.length);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
+            //SECURITY
+            
+                boolean flag = false;
+                String pass = MyServer.getPass(filename);
+                if(pass.length()!=0){
+                    communicationOut.println("protected");
+                    String pwd = communicationIn.readLine(); //user inputted password
+                    if (pwd.equals(pass)){
+                        communicationOut.println("valid");
+                        flag = true;
+                    }
+                    else{
+                        communicationOut.println("invalid");
+                        flag = false;
+                    }
                 }
-                System.out.println("Sending Files...");
-                os.write(bytearray, 0, bytearray.length);
-                os.flush();
-                // os.close();
+                else{
+                    communicationOut.println("public");
+                    flag = true;
 
-                // Requires acknowledgment of client to synchronize their processes
-                communicationIn.readLine();
-                System.out.println("done");
+                }
+                if(flag==true){
 
-                // Acknowledgment of user
+                    
 
+                    // Sending file to client
+                    communicationOut.println(transferFile.length());
+                    byte[] bytearray = new byte[(int) transferFile.length()];
+                    FileInputStream fin = new FileInputStream(transferFile);
+                    BufferedInputStream bin = new BufferedInputStream(fin);
+                    bin.read(bytearray, 0, bytearray.length);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    System.out.println("Sending Files...");
+                    os.write(bytearray, 0, bytearray.length);
+                    os.flush();
+                    // os.close();
+
+                    // Requires acknowledgment of client to synchronize their processes
+                    communicationIn.readLine();
+                    System.out.println("done");
+
+                    // Acknowledgment of user
+                }
             }
 
         }

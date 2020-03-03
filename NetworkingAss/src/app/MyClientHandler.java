@@ -12,8 +12,9 @@ public class MyClientHandler implements Runnable {
     private PrintWriter communicationOut;
     private BufferedReader communicationIn;
     private OutputStream os;
-    private String myClientUname="";
+    private String myClientUname = "";
     private boolean close_unexpectedly = false;
+
     // constructor
     public MyClientHandler(Socket myClientSocket) throws IOException {
         // assignes the communication socket to myClient.
@@ -50,9 +51,10 @@ public class MyClientHandler implements Runnable {
             }
             if (checkPass.equals(password)) {
                 communicationOut.println("success");
-                System.out.println("Client with address " + myClient.getRemoteSocketAddress().toString() + " has opened connection");
+                System.out.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                        + " has opened connection");
                 // continous loop
-                myClientUname=uName;
+                myClientUname = uName;
                 boolean flag = true;
                 while (flag) {
                     // reads what the client sent.
@@ -74,7 +76,7 @@ public class MyClientHandler implements Runnable {
                         case "3":
                         case "QUERY":
                             query();
-                            //System.out.println("Told me to QUERY");
+                            // System.out.println("Told me to QUERY");
                             break;
                         case "4":
                         case "QUIT":
@@ -88,22 +90,21 @@ public class MyClientHandler implements Runnable {
             } else {
                 communicationOut.println("fail");
             }
-        } catch (IOException e) {}
-        catch(NullPointerException ex)
-        {
-            System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection unexpectly ");
+        } catch (IOException e) {
+        } catch (NullPointerException ex) {
+            System.err.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                    + " has closed connection unexpectly ");
             close_unexpectedly = true;
-        }
-         finally {
+        } finally {
             try {
                 // closing bufferedReader and printWriter
                 communicationIn.close();
                 communicationOut.close();
                 os.close();
 
-                if (!close_unexpectedly)
-                {
-                    System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection");
+                if (!close_unexpectedly) {
+                    System.err.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                            + " has closed connection");
                 }
             } catch (IOException e) {
             }
@@ -111,10 +112,15 @@ public class MyClientHandler implements Runnable {
 
     }
 
-    private void query(){
-
+    private void query() {
 
         communicationOut.println(MyServer.toStringAll());
+        try {
+            communicationIn.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 
@@ -193,6 +199,7 @@ public class MyClientHandler implements Runnable {
 
                 // Send acknowledgement to server to synchronize their progress
                 communicationOut.println("Server has downloaded file");
+                System.out.println(communicationIn.readLine());
 
             }
 

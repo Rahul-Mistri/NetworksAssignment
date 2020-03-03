@@ -13,7 +13,7 @@ public class MyClientHandler implements Runnable {
     private BufferedReader communicationIn;
     private OutputStream os;
     private String myClientUname="";
-
+    private boolean close_unexpectedly = false;
     // constructor
     public MyClientHandler(Socket myClientSocket) throws IOException {
         // assignes the communication socket to myClient.
@@ -50,12 +50,12 @@ public class MyClientHandler implements Runnable {
             }
             if (checkPass.equals(password)) {
                 communicationOut.println("success");
+                System.out.println("Client with address " + myClient.getRemoteSocketAddress().toString() + " has opened connection");
                 // continous loop
                 myClientUname=uName;
                 boolean flag = true;
                 while (flag) {
                     // reads what the client sent.
-                    System.out.println("Top of the menu");
                     String menu = "1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
                     communicationOut.println(menu);
                     String request = communicationIn.readLine();
@@ -78,7 +78,6 @@ public class MyClientHandler implements Runnable {
                             break;
                         case "4":
                         case "QUIT":
-                            System.out.println("Told me to QUIT");
                             communicationOut.println("connection on port #" + myClient.getPort() + " is closed");
                             flag = false;
                             break;
@@ -87,18 +86,25 @@ public class MyClientHandler implements Runnable {
                     }
                 }
             } else {
-                System.out.println("Invalid user name and password. Please try again.");
                 communicationOut.println("fail");
             }
-        } catch (IOException e) {
-
-        } finally {
+        } catch (IOException e) {}
+        catch(NullPointerException ex)
+        {
+            System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection unexpectly ");
+            close_unexpectedly = true;
+        }
+         finally {
             try {
                 // closing bufferedReader and printWriter
                 communicationIn.close();
                 communicationOut.close();
                 os.close();
-                System.out.println("Closed stuff");
+
+                if (!close_unexpectedly)
+                {
+                    System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection");
+                }
             } catch (IOException e) {
             }
         }
@@ -161,7 +167,8 @@ public class MyClientHandler implements Runnable {
 
                 // Variables for server input and stream objects that write to a local file
                 InputStream is = myClient.getInputStream();
-                FileOutputStream fos = new FileOutputStream("Server_Copy_Of_" + filename);
+                String file_path = getFile_Path("server_storage", filename);
+                FileOutputStream fos = new FileOutputStream(file_path);
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
 
                 // Read the first byte stream
@@ -283,11 +290,19 @@ public class MyClientHandler implements Runnable {
     public File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss";
+        String subdirectory = "NetworkingAss"+ File.separatorChar +"server_storage";
         String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;
+    }
+
+    public String getFile_Path(String subdirectory,String filename) {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar + subdirectory + File.separatorChar+ filename; //subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        return filepath.toString();
     }
 
 }

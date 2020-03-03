@@ -20,6 +20,7 @@ public class MyClient {
             // serversIp and the port 6666.
             Socket connectionSocket = new Socket(SERVERIP, SERVERPORT);
 
+            
             BufferedReader communicationIn= new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));;
             BufferedReader fromUser= new BufferedReader(new InputStreamReader(System.in));;
             PrintWriter communicationOut= new PrintWriter(connectionSocket.getOutputStream(), true);;
@@ -160,7 +161,7 @@ private static void makequery(BufferedReader communicationIn){
             String filename = fromUser.readLine();
 
             // Find file in the users loal directory
-            File transferFile = getFile(filename);
+            File transferFile = getFile("client_uploads",filename);
 
             // File does not exist
             if (!transferFile.exists()) {
@@ -274,7 +275,7 @@ private static void makequery(BufferedReader communicationIn){
 
                     // Variables for server input and stream objects that write to a local file
                     InputStream is = connectionSocket.getInputStream();
-                    FileOutputStream fos = new FileOutputStream("copy.txt");
+                    FileOutputStream fos = new FileOutputStream(getFile_Path("client_downloads", filename));
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
 
                     // Read the first byte stream
@@ -319,13 +320,20 @@ private static void makequery(BufferedReader communicationIn){
         }
     }
 
-    public static File getFile(String filename) {
+    public static File getFile(String subdirectory,String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss"+ File.separatorChar +"client_storage";
-        String subDir_And_Filename = subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory+ File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;
+    }
+
+    public static String getFile_Path(String subdirectory,String filename) {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar + subdirectory + File.separatorChar+ filename; //subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        return filepath.toString();
     }
 }

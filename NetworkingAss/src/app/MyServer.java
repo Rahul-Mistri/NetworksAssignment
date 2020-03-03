@@ -70,7 +70,7 @@ public class MyServer {
     public static void storeUsersAndPassword() {
         try {
             usersAndPass = new HashMap<String, String>();
-            Scanner sc = new Scanner(new FileReader(getFile_Path("users.txt")));
+            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup","users.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
                 String temp[] = line.split(" ");
@@ -84,7 +84,7 @@ public class MyServer {
 
     public static void fillList() {
         try {
-            Scanner sc = new Scanner(new FileReader("ExistingFiles.txt"));
+            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup","ExistingFiles.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
                 String temp[] = line.split("#");
@@ -102,18 +102,17 @@ public class MyServer {
     }
 
 
-    public static String getFile_Path(String filename) {
+    public static String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss"+ File.separatorChar +"server_storage";
-        String subDir_And_Filename = subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();
     }
 
     public static void writeList(){
         try {
-            PrintWriter pw = new PrintWriter(new FileWriter("ExistingFiles.txt"));
+            PrintWriter pw = new PrintWriter(new FileWriter(getFile_Path("server_setup","ExistingFiles.txt")));
             for (FileObject f : list) {
                 pw.println(f.toString());
             }

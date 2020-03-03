@@ -106,10 +106,7 @@ public class MyClientHandler implements Runnable {
     }
 
     private void query(){
-        System.out.println("wqow");
 
-        System.out.println(MyServer.list);
-        System.out.println("wqow");
 
         communicationOut.println(MyServer.toStringAll());
 

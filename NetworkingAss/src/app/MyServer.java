@@ -128,7 +128,7 @@ public class MyServer {
     public static String toStringAll(){
         String x = "";
         for (FileObject f : list) {
-            x=f.prettyToString()+"###";
+            x+=f.prettyToString()+"###";
             
         }
         return x;

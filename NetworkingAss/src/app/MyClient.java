@@ -132,7 +132,6 @@ public class MyClient {
 private static void makequery(BufferedReader communicationIn){
     try {
         String line = communicationIn.readLine();
-        System.out.println(line);
         String temp[]=line.split("###");
         for (String st : temp) {
             System.out.println(st);

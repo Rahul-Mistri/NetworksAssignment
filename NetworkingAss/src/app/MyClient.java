@@ -11,8 +11,8 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
-    // private static final String SERVERIP = "196.47.241.137";
-    private static final String SERVERIP = "localhost";
+    private static final String SERVERIP = "196.47.241.137";
+    // private static final String SERVERIP = "localhost";
 
     public static void main(String[] args) {
         try {
@@ -65,11 +65,14 @@ public class MyClient {
             String userInput = "";
             Boolean flag = true;
             while (flag) {
+                System.out.println("Top of the menu");
 
                 communicationIn = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                
                 fromUser = new BufferedReader(new InputStreamReader(System.in));
                 communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
 
+                
                 // user input taken in.
                 String cLine = communicationIn.readLine();
                 System.out.println(cLine);
@@ -205,8 +208,9 @@ private static void makequery(BufferedReader communicationIn){
                 os.flush();
 
                 // Requires acknowledgment of client to synchronize their processes
-                communicationIn.readLine();
+                System.out.println(communicationIn.readLine());
                 System.out.println("done");
+                communicationOut.println("Client read file");
 
                 // Starts to send the file content
 

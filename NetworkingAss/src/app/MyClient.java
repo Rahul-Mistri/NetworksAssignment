@@ -157,9 +157,7 @@ private static void makequery(BufferedReader communicationIn){
             String filename = fromUser.readLine();
 
             // Find file in the users loal directory
-            String directory_path = System.getProperty("user.dir") + "/NetworkingAss/";
-            File transferFile = new File(directory_path + filename);
-            System.out.println("File to be uploaded" + directory_path + filename);
+            File transferFile = getFile(filename);
 
             // File does not exist
             if (!transferFile.exists()) {
@@ -220,6 +218,7 @@ private static void makequery(BufferedReader communicationIn){
         }
 
     }
+
 
     private static void download(BufferedReader communicationIn, PrintWriter communicationOut, BufferedReader fromUser,
             Socket connectionSocket) {
@@ -316,10 +315,10 @@ private static void makequery(BufferedReader communicationIn){
         }
     }
 
-    public File getFile(String filename) {
+    public static File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss";
+        String subdirectory = "NetworkingAss"+ File.separatorChar +"client_storage";
         String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();

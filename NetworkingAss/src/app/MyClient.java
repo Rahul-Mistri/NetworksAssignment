@@ -11,7 +11,7 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
-    private static final String SERVERIP = "196.47.241.137";
+    private static final String SERVERIP = "196.42.87.87";
     // private static final String SERVERIP = "localhost";
 
     public static void main(String[] args) {

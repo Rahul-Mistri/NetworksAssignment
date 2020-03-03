@@ -77,6 +77,7 @@ public class MyServer {
     public static void storeUsersAndPassword() {
         try {
             usersAndPass = new HashMap<String, String>();
+            //System.out.println("fak"+getFile_Path("server_setup","users.txt"));
             Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup","users.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();

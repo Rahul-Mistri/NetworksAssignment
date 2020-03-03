@@ -2,6 +2,8 @@ package app;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,7 +70,7 @@ public class MyServer {
     public static void storeUsersAndPassword() {
         try {
             usersAndPass = new HashMap<String, String>();
-            Scanner sc = new Scanner(new FileReader("users.txt"));
+            Scanner sc = new Scanner(new FileReader(getFile_Path("users.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
                 String temp[] = line.split(" ");
@@ -79,6 +81,7 @@ public class MyServer {
             e.printStackTrace();
         }
     }
+
     public static void fillList() {
         try {
             Scanner sc = new Scanner(new FileReader("ExistingFiles.txt"));
@@ -96,6 +99,16 @@ public class MyServer {
             System.out.println(e);
             e.printStackTrace();
         }
+    }
+
+
+    public static String getFile_Path(String filename) {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subdirectory = "NetworkingAss"+ File.separatorChar +"server_storage";
+        String subDir_And_Filename = subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        return filepath.toString();
     }
 
     public static void writeList(){

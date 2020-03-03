@@ -40,10 +40,16 @@ public class MyClient {
             userName = fromUser.readLine();
             communicationOut.println(userName);
             // password
-            System.out.print(communicationIn.readLine());
-            String password;
-            password = fromUser.readLine();
-            communicationOut.println(password);
+            String passwordPrompt = (communicationIn.readLine());
+            System.out.print(passwordPrompt);
+            //password = fromUser.readLine();
+            Console console = System.console();
+            char[] pwd= console.readPassword();
+            String final_password = new String(pwd);
+            System.out.println("Password is "+final_password);
+            
+
+            communicationOut.println(pwd);
             String state = communicationIn.readLine();
             if (state.equals("success")) {
                 // continous loop
@@ -128,6 +134,7 @@ public class MyClient {
         // System.out.println(e);
     }
 }
+
 
 private static void makequery(BufferedReader communicationIn){
     try {
@@ -270,15 +277,26 @@ private static void makequery(BufferedReader communicationIn){
                     // Read the first byte stream
                     bytesRead = is.read(bytearray, 0, bytearray.length);
                     currentTot = bytesRead;
+                    char[] animationChars =new char[]{'|','/','-','\\'};
+                    int i=0;
 
                     // Read the server's remaining byte streams in chunks
                     do {
                         // Reads the bytestream and adds it to the byteArray
                         bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
+                        System.out.print("Downloading: "+ (Math.round(((currentTot+0.0)/bytearray.length)*100))+"% "+animationChars[i%4]+"\r");
+                        i++;
+                        try{
+                            Thread.sleep((100));
+                        }
+                        catch(InterruptedException ex){
+                            ex.printStackTrace();
+                        }
                         // Updates the remaining bytes to be read
                         if (bytesRead > 0)
                             currentTot += bytesRead;
                     } while (bytesRead > 0);
+                    System.out.println("Downloading: Done!          ");
 
                     // Write the locally stored byte streams into client file
                     bos.write(bytearray, 0, currentTot);

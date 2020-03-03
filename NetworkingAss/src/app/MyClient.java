@@ -99,7 +99,7 @@ public class MyClient {
 
                     case "3":
                     case "QUERY":
-                        // do something
+                        makequery(communicationIn);
                         break;
 
                     case "4":
@@ -126,6 +126,19 @@ public class MyClient {
     }
     catch (Exception e) {
         // System.out.println(e);
+    }
+}
+
+private static void makequery(BufferedReader communicationIn){
+    try {
+        String line = communicationIn.readLine();
+        System.out.println(line);
+        String temp[]=line.split("###");
+        for (String st : temp) {
+            System.out.println(st);
+        }
+    } catch (Exception e) {
+        //TODO: handle exception
     }
 }
 
@@ -158,6 +171,16 @@ public class MyClient {
                 communicationOut.println(filename);
                 // Sedn file length to the server
                 communicationOut.println(transferFile.length());
+                //ask if want password
+                System.out.print("Do you want to password protect your file? (Y/N): ");
+                String ans = ""+fromUser.readLine().toUpperCase().charAt(0);
+                String pwd = "";
+                if (ans.equals("Y")){
+                    System.out.print("Enter file password: ");
+                    pwd = fromUser.readLine();
+                }
+
+                communicationOut.println(pwd);
 
                 // Transform file data into bytearray
                 byte[] bytearray = new byte[(int) transferFile.length()];
@@ -216,44 +239,63 @@ public class MyClient {
             // Download incoming file
             else {
 
-                // Setup to read the bytestream
-                int filesize = Integer.parseInt(communicationIn.readLine());
-                int bytesRead;
-                int currentTot = 0;
-                byte[] bytearray = new byte[filesize];
+                //SECURITY
+                //boolean flag = true; //IF THROW NOT WORKING
 
-                // Variables for server input and stream objects that write to a local file
-                InputStream is = connectionSocket.getInputStream();
-                FileOutputStream fos = new FileOutputStream("copy.txt");
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                //read if file privacy is public or protected
+                String privacy = communicationIn.readLine(); //protected or public
+                if (privacy.equals("protected")) {
+                    System.out.print("Enter file password: ");
+                    String pass = fromUser.readLine();
+                    communicationOut.println(pass);
+                    String validity = communicationIn.readLine(); //valid or invalid
+                    if (validity.equals("invalid")){
+                        throw new Exception("Incorrect password...\nExiting download session");
+                        //flag = false;
+                    }
+                } 
 
-                // Read the first byte stream
-                bytesRead = is.read(bytearray, 0, bytearray.length);
-                currentTot = bytesRead;
+                //if (flag){ //IF THROW NOT WORKING
 
-                // Read the server's remaining byte streams in chunks
-                do {
-                    // Reads the bytestream and adds it to the byteArray
-                    bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
-                    // Updates the remaining bytes to be read
-                    if (bytesRead > 0)
-                        currentTot += bytesRead;
-                } while (bytesRead > 0);
+                    // Setup to read the bytestream
+                    int filesize = Integer.parseInt(communicationIn.readLine());
+                    int bytesRead;
+                    int currentTot = 0;
+                    byte[] bytearray = new byte[filesize];
 
-                // Write the locally stored byte streams into client file
-                bos.write(bytearray, 0, currentTot);
-                bos.flush();
+                    // Variables for server input and stream objects that write to a local file
+                    InputStream is = connectionSocket.getInputStream();
+                    FileOutputStream fos = new FileOutputStream("copy.txt");
+                    BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-                // Close the filewriting outputstream object
-                bos.close();
+                    // Read the first byte stream
+                    bytesRead = is.read(bytearray, 0, bytearray.length);
+                    currentTot = bytesRead;
 
-                // Send acknowledgement to server to synchronize their progress
-                communicationOut.println("Client has downloaded file");
+                    // Read the server's remaining byte streams in chunks
+                    do {
+                        // Reads the bytestream and adds it to the byteArray
+                        bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
+                        // Updates the remaining bytes to be read
+                        if (bytesRead > 0)
+                            currentTot += bytesRead;
+                    } while (bytesRead > 0);
+
+                    // Write the locally stored byte streams into client file
+                    bos.write(bytearray, 0, currentTot);
+                    bos.flush();
+
+                    // Close the filewriting outputstream object
+                    bos.close();
+
+                    // Send acknowledgement to server to synchronize their progress
+                    communicationOut.println("Client has downloaded file");
+                //} //IF THROW NOT WORKING
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

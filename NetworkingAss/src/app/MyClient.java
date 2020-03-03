@@ -109,7 +109,7 @@ public class MyClient {
 
                     case "3":
                     case "QUERY":
-                        makequery(communicationIn);
+                        makequery(communicationIn, communicationOut);
                         break;
 
                     case "4":
@@ -140,13 +140,14 @@ public class MyClient {
 }
 
 
-private static void makequery(BufferedReader communicationIn){
+private static void makequery(BufferedReader communicationIn, PrintWriter communicationOut){
     try {
         String line = communicationIn.readLine();
         String temp[]=line.split("###");
         for (String st : temp) {
             System.out.println(st);
         }
+        communicationOut.println("query done");
     } catch (Exception e) {
         //TODO: handle exception
     }

@@ -48,7 +48,7 @@ public class MyClient {
             communicationOut.println(userName);
             // Display password prompt
             String passwordPrompt = (communicationIn.readLine());
-            System.out.println(passwordPrompt);
+            System.out.print(passwordPrompt);
             // Read in password while hiding it in the cli
             Console console = System.console();
             char[] pwd = console.readPassword();

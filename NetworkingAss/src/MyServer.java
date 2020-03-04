@@ -1,4 +1,4 @@
-package app;
+
 
 import java.io.*;
 import java.net.*;
@@ -138,7 +138,7 @@ public class MyServer {
     public static String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = /*"NetworkingAss"+ File.separatorChar +*/subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();
     }

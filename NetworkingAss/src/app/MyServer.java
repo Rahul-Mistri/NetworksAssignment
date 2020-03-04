@@ -47,7 +47,8 @@ public class MyServer {
                 // System.out.print("\033[H\033[2J");
                 // System.out.flush();
                 System.out.print("\nServer was shutdown!\n");
-
+                writeList();
+                
             }
         });
 
@@ -119,20 +120,7 @@ public class MyServer {
      * @param String filename
      */
 
-    public static String getFile_Path(String subdirectory, String filename) {
-        Path currentRelativePath = Paths.get("");
-        Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
-                + filename;
-        Path filepath = currentDir.resolve(subDir_And_Filename);
-        return filepath.toString();
-    }
-
-    /**
-     * Writes the new files downloaded during runtime to the persistent file system
-     */
-
-    public static void writeList() {
+    public static void writeList(){
         try {
             PrintWriter pw = new PrintWriter(new FileWriter(getFile_Path("server_setup", "ExistingFiles.txt")));
             for (FileObject f : list) {
@@ -146,12 +134,21 @@ public class MyServer {
 
     }
 
+
+    public static String getFile_Path(String subdirectory, String filename) {
+        Path currentRelativePath = Paths.get("");
+        Path currentDir = currentRelativePath.toAbsolutePath();
+        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory + File.separatorChar + filename;
+        Path filepath = currentDir.resolve(subDir_And_Filename);
+        return filepath.toString();
+    }
+
     /**
      * Adds file objects to the linked used during runtime queries
      * 
      * @param f
      */
-    public static void addToList(FileObject f) {
+    public static void addToList(FileObject f){
         list.add(f);
     }
 

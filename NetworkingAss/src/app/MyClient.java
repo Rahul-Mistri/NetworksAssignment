@@ -48,7 +48,7 @@ public class MyClient {
             // Read in password while hiding it in the cli
             Console console = System.console();
             char[] pwd = console.readPassword();
-            String final_password = new String(pwd);
+            //String final_password = new String(pwd);
             // Send password to the server
             communicationOut.println(pwd);
             // Get authentication result
@@ -97,7 +97,7 @@ public class MyClient {
 
                         case "3":
                         case "QUERY":
-                            makequery(communicationIn);
+                            makequery(communicationIn,communicationOut);
                             break;
 
                         case "4":
@@ -123,23 +123,23 @@ public class MyClient {
             ;
         }
     }
-
-    /**
+/**
      * List query method that prints all available files to be downloaded
      * 
      * @param communicationIn
      */
-    private static void makequery(BufferedReader communicationIn) {
-        try {
-            String line = communicationIn.readLine();
-            String temp[] = line.split("###");
-            for (String st : temp) {
-                System.out.println(st);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
+private static void makequery(BufferedReader communicationIn, PrintWriter communicationOut){
+    try {
+        String line = communicationIn.readLine();
+        String temp[]=line.split("###");
+        for (String st : temp) {
+            System.out.println(st);
         }
+        communicationOut.println("query done");
+    } catch (Exception e) {
+        
     }
+}
 
     /**
      * Uploads a user's file to the servers file system

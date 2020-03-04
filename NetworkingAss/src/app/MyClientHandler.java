@@ -29,10 +29,10 @@ public class MyClientHandler implements Runnable {
 
     }
 
-    @Override
     /**
      * Runs the body of the communication thread
      */
+    @Override
     public void run() {
         try {
             // Creates objects for server/client communication, I/O and file writing
@@ -142,7 +142,14 @@ public class MyClientHandler implements Runnable {
 
     // Sends list of files to be displayed when client makes a "query" request
     private void query() {
+
         communicationOut.println(MyServer.toStringAll());
+        try {
+            communicationIn.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private void upload_query() {
@@ -195,6 +202,7 @@ public class MyClientHandler implements Runnable {
 
                 // Send acknowledgement to server to synchronize their progress
                 communicationOut.println("Server has downloaded file");
+                System.out.println(communicationIn.readLine());
 
             }
 

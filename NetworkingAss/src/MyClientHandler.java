@@ -1,4 +1,4 @@
-package app;
+
 
 import java.io.*;
 import java.net.*;
@@ -298,7 +298,7 @@ public class MyClientHandler implements Runnable {
     public File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss" + File.separatorChar + "server_storage";
+        String subdirectory = /*"NetworkingAss" + File.separatorChar + */"server_storage";
         String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
@@ -313,7 +313,7 @@ public class MyClientHandler implements Runnable {
     public String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+        String subDir_And_Filename = /*"NetworkingAss" + File.separatorChar + */subdirectory + File.separatorChar
                 + filename; // subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();

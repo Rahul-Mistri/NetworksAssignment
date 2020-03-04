@@ -1,4 +1,4 @@
-package app;
+
 
 import java.io.*;
 import java.net.*;
@@ -9,9 +9,10 @@ import java.util.*;
 public class MyClient {
 
     // Setting the constant connection port
-    private static final int SERVERPORT = 6666;
+    private static int SERVERPORT = 6666;
     // setting the constant ip of the server
-    private static final String SERVERIP = "196.47.241.137";  //196.42.87.87
+    //private static final String SERVERIP = "196.47.241.137";  //196.42.87.87
+    private static String SERVERIP = "localhost";
 
     /**
      * @param args
@@ -20,6 +21,9 @@ public class MyClient {
 
     public static void main(String[] args) {
         try {
+
+            validateArgs(args);
+
 
             // Create socket to connect to server with parameterized server address and port
             Socket connectionSocket = new Socket(SERVERIP, SERVERPORT);
@@ -118,11 +122,32 @@ public class MyClient {
             // closing the communication socket.
             connectionSocket.close();
 
+        
+        }catch (ConnectException ex){
+            System.err.println("Connection to server with address "+SERVERIP+" and port "+SERVERPORT+" was refused");
         } catch (Exception e) {
             e.printStackTrace();
-            ;
+            
         }
     }
+
+    public static void validateArgs(String[] args){
+        if(args==null || args.length!=2){
+            System.err.println("Only enter the server ip followed by server port");
+            System.exit(1);
+        }
+        else{
+            SERVERIP=args[0];
+            
+        }
+        try {
+            SERVERPORT=Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            //TODO: handle exception
+            System.err.println("please enter an integer port number");
+        }
+    }
+
 /**
      * List query method that prints all available files to be downloaded
      * 
@@ -338,7 +363,7 @@ private static void makequery(BufferedReader communicationIn, PrintWriter commun
     public static File getFile(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+        String subDir_And_Filename = /*"NetworkingAss" + File.separatorChar + */subdirectory + File.separatorChar
                 + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
@@ -356,7 +381,7 @@ private static void makequery(BufferedReader communicationIn, PrintWriter commun
     public static String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+        String subDir_And_Filename = /*"NetworkingAss" + File.separatorChar + */subdirectory + File.separatorChar
                 + filename; // subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();

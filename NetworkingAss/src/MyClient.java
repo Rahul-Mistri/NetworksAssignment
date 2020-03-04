@@ -157,6 +157,7 @@ private static void makequery(BufferedReader communicationIn, PrintWriter commun
     try {
         String line = communicationIn.readLine();
         String temp[]=line.split("###");
+        System.out.println(" \n \nStatus\tFile\t\t\tOwner");
         for (String st : temp) {
             System.out.println(st);
         }

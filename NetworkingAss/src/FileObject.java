@@ -97,7 +97,7 @@ public class FileObject {
         {
             x = "\uD83D\uDD12";
         }
-        return (x+"\t\t\t"+fileName+"\t\t\t"+owner);
+        return (x+"\t"+fileName+"\t\t\t"+owner);
     }
 
     

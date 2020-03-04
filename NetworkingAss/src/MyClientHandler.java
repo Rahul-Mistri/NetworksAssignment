@@ -77,7 +77,7 @@ public class MyClientHandler implements Runnable {
                 boolean flag = true;
                 while (flag) {
                     // Send menu prompt to the client
-                    String menu = "Menu\n1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
+                    String menu = " \n \nMenu\n----------------\n1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \nEnter a command\n----------------\n";
                     communicationOut.println(menu);
                     // Read the user's selection
                     String request = communicationIn.readLine();

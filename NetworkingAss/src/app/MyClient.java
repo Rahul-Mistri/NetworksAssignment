@@ -11,157 +11,155 @@ public class MyClient {
     // Setting the constant connection port
     private static final int SERVERPORT = 6666;
     // setting the constant ip of the server
-    private static final String SERVERIP = "196.47.241.137";
+    private static final String SERVERIP = "196.47.241.137";  //196.42.87.87
+
+    /**
+     * @param args
+     */
     // private static final String SERVERIP = "localhost";
 
     public static void main(String[] args) {
         try {
-            // connectionSocket is making a connection request to the server using the
-            // serversIp and the port 6666.
+
+            // Create socket to connect to server with parameterized server address and port
             Socket connectionSocket = new Socket(SERVERIP, SERVERPORT);
 
+            // Creates objects for server/client communication, I/O and file writing
+            // purposes
+            BufferedReader communicationIn = new BufferedReader(
+                    new InputStreamReader(connectionSocket.getInputStream()));
             
-            BufferedReader communicationIn= new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));;
-            BufferedReader fromUser= new BufferedReader(new InputStreamReader(System.in));;
-            PrintWriter communicationOut= new PrintWriter(connectionSocket.getOutputStream(), true);;
+            BufferedReader fromUser = new BufferedReader(new InputStreamReader(System.in));
+            
+            PrintWriter communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
             OutputStream os = connectionSocket.getOutputStream();
 
-            // TEMPORARY BufferedReader fromUser will get an input from the user.
-            // PrintWriter communicationOut is used to send messages to the server.
-            
-           
-            /////////////START INCOMING
-            communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
-            // System.out.println(menu);
+             communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
 
-            // authentication
-            // username
+            // Display server's authentication prompt
             System.out.print(communicationIn.readLine());
+            // Read username
             String userName;
             userName = fromUser.readLine();
             communicationOut.println(userName);
-            // password
+            // Display password prompt
             String passwordPrompt = (communicationIn.readLine());
-            System.out.print(passwordPrompt);
-            //password = fromUser.readLine();
+            System.out.println(passwordPrompt);
+            // Read in password while hiding it in the cli
             Console console = System.console();
-            char[] pwd= console.readPassword();
+            char[] pwd = console.readPassword();
             String final_password = new String(pwd);
-            System.out.println("Password is "+final_password);
-            
-
+            // Send password to the server
             communicationOut.println(pwd);
+            // Get authentication result
             String state = communicationIn.readLine();
+            // Proceed with requests if username and password were succesful
             if (state.equals("success")) {
-                // continous loop
 
-                
+                // Run continuos command loop until user selects "quit" option
+                String userInput = "";
+                Boolean flag = true;
+                while (flag) {
 
+                    // Create input/output variables for every new command
+                    communicationIn = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                    fromUser = new BufferedReader(new InputStreamReader(System.in));
+                    communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
 
-
-
-                 //BEGINNIING ORIGINAL
-
-            // continous loop
-            String userInput = "";
-            Boolean flag = true;
-            while (flag) {
-                System.out.println("Top of the menu");
-
-                communicationIn = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-                
-                fromUser = new BufferedReader(new InputStreamReader(System.in));
-                communicationOut = new PrintWriter(connectionSocket.getOutputStream(), true);
-
-                
-                // user input taken in.
-                String cLine = communicationIn.readLine();
-                System.out.println(cLine);
-
-                while (!(cLine.equals(""))) {
-                    //END ORIGINAL
-
-                    
-                    //END INCOMING////////////////////
-
-                    // user input taken in .
-                    cLine = communicationIn.readLine();
+                    // Reading and displaying servers menu prompt
+                    String cLine = communicationIn.readLine();
                     System.out.println(cLine);
-                    
-                }
 
-                // Taking user input
-                userInput = fromUser.readLine();
+                    while (!(cLine.equals(""))) {
 
-                // sending the request to the server.
-                communicationOut.println(userInput);
+                        cLine = communicationIn.readLine();
+                        System.out.println(cLine);
 
-                switch (userInput) {
-                    case "1":
-                    case "UPLOAD":
-                        upload(communicationIn, communicationOut, fromUser, os);
-                        break;
+                    }
 
-                    case "2":
-                    case "DOWNLOAD":
-                        download(communicationIn, communicationOut, fromUser, connectionSocket);
-                        break;
+                    // Read users command option
+                    userInput = fromUser.readLine();
 
-                    case "3":
-                    case "QUERY":
-                        makequery(communicationIn);
-                        break;
+                    // Sending the command request to the server.
+                    communicationOut.println(userInput);
 
-                    case "4":
-                    case "QUIT":
-                        System.out.println(communicationIn.readLine());
-                        flag = false;
-                        break;
+                    // Switch statement for every available command option
+                    switch (userInput) {
+                        case "1":
+                        case "UPLOAD":
+                            upload(communicationIn, communicationOut, fromUser, os);
+                            break;
+
+                        case "2":
+                        case "DOWNLOAD":
+                            download(communicationIn, communicationOut, fromUser, connectionSocket);
+                            break;
+
+                        case "3":
+                        case "QUERY":
+                            makequery(communicationIn);
+                            break;
+
+                        case "4":
+                        case "QUIT":
+                            System.out.println(communicationIn.readLine());
+                            flag = false;
+                            break;
+
+                    }
 
                 }
 
             }
-            
-           
+            // User authentication failed
+            else {
+                System.out.println("Invalid User name and password \nExiting...");
+            }
+            // closing the communication socket.
+            connectionSocket.close();
 
-        } else {
-            System.out.println("Invalid User name and password \nExiting...");
+        } catch (Exception e) {
+            e.printStackTrace();
+            ;
         }
-        // closing the communication socket.
-        connectionSocket.close();
-        
-
-        
-        
     }
-    catch (Exception e) {
-        // System.out.println(e);
-    }
-}
 
-
-private static void makequery(BufferedReader communicationIn){
-    try {
-        String line = communicationIn.readLine();
-        String temp[]=line.split("###");
-        for (String st : temp) {
-            System.out.println(st);
+    /**
+     * List query method that prints all available files to be downloaded
+     * 
+     * @param communicationIn
+     */
+    private static void makequery(BufferedReader communicationIn) {
+        try {
+            String line = communicationIn.readLine();
+            String temp[] = line.split("###");
+            for (String st : temp) {
+                System.out.println(st);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
         }
-    } catch (Exception e) {
-        //TODO: handle exception
     }
-}
 
+    /**
+     * Uploads a user's file to the servers file system
+     * 
+     * @param communicationIn
+     * @param communicationOut
+     * @param fromUser
+     * @param os
+     */
     private static void upload(BufferedReader communicationIn, PrintWriter communicationOut, BufferedReader fromUser,
             OutputStream os) {
 
         try {
+
             // Ask for upload file on the client side
             System.out.println("Enter the filename");
             String filename = fromUser.readLine();
 
-            // Find file in the users loal directory
-            File transferFile = getFile("client_uploads",filename);
+            // Find file in the users local directory
+            File transferFile = getFile("client_uploads", filename);
 
             // File does not exist
             if (!transferFile.exists()) {
@@ -173,35 +171,39 @@ private static void makequery(BufferedReader communicationIn){
             }
 
             // File exists
-            // Upload toserver
+            // Upload file to server
             else {
                 // Send filename to the server
                 communicationOut.println(filename);
-                // Sedn file length to the server
+                // Send file length to the server for file reading purposes on the receivers
+                // side
                 communicationOut.println(transferFile.length());
-                //ask if want password
+                // Ask if the user wants to set a password for uploaded file
                 System.out.print("Do you want to password protect your file? (Y/N): ");
-                String ans = ""+fromUser.readLine().toUpperCase().charAt(0);
+                String ans = "" + fromUser.readLine().toUpperCase().charAt(0);
                 String pwd = "";
-                if (ans.equals("Y")){
+                if (ans.equals("Y")) {
                     System.out.print("Enter file password: ");
                     pwd = fromUser.readLine();
                 }
-
+                // Send users selected option to the user
                 communicationOut.println(pwd);
 
-                // Transform file data into bytearray
+                // Transform file data into bytearray to read the file into byte "chunks"
                 byte[] bytearray = new byte[(int) transferFile.length()];
                 FileInputStream fin = new FileInputStream(transferFile);
                 BufferedInputStream bin = new BufferedInputStream(fin);
 
+                // Thread that syncrhonizes the "write" process on the sender's device and the
+                // "read" process on the receivers device
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
-
+                // Read file into bytearray
                 bin.read(bytearray, 0, bytearray.length);
+                // Display progress information to the sender
                 System.out.println("Sending Files...");
 
                 // Write results to the server
@@ -212,9 +214,6 @@ private static void makequery(BufferedReader communicationIn){
                 System.out.println(communicationIn.readLine());
                 System.out.println("done");
                 communicationOut.println("Client read file");
-
-                // Starts to send the file content
-
             }
 
         } catch (IOException e) {
@@ -224,7 +223,14 @@ private static void makequery(BufferedReader communicationIn){
 
     }
 
-
+    /**
+     * Download a file from the servers file system
+     * 
+     * @param communicationIn
+     * @param communicationOut
+     * @param fromUser
+     * @param connectionSocket
+     */
     private static void download(BufferedReader communicationIn, PrintWriter communicationOut, BufferedReader fromUser,
             Socket connectionSocket) {
 
@@ -238,80 +244,81 @@ private static void makequery(BufferedReader communicationIn){
             String filename = fromUser.readLine();
             communicationOut.println(filename);
 
-            // Download file or Display 404 message
+            // Retrieve the fetching result (found/notFound)
             String server_header = communicationIn.readLine();
+
+            // Download file or Display 404 message
 
             // Not found action
             if (server_header.equalsIgnoreCase("Error 404")) {
                 System.out.println("Error 404");
 
             }
+
             // Download incoming file
             else {
+                // Read if file privacy is public or protected
 
-                //SECURITY
-                //boolean flag = true; //IF THROW NOT WORKING
-
-                //read if file privacy is public or protected
-                String privacy = communicationIn.readLine(); //protected or public
+                // Can be protected or public
+                String privacy = communicationIn.readLine();
                 if (privacy.equals("protected")) {
                     System.out.print("Enter file password: ");
                     String pass = fromUser.readLine();
                     communicationOut.println(pass);
-                    String validity = communicationIn.readLine(); //valid or invalid
-                    if (validity.equals("invalid")){
+                    String validity = communicationIn.readLine();
+                    if (validity.equals("invalid")) {
                         throw new Exception("Incorrect password...\nExiting download session");
-                        //flag = false;
+
                     }
-                } 
+                }
 
-                //if (flag){ //IF THROW NOT WORKING
+                // Setup to read the bytestream
+                int filesize = Integer.parseInt(communicationIn.readLine());
+                int bytesRead;
+                int currentTot = 0;
+                byte[] bytearray = new byte[filesize];
 
-                    // Setup to read the bytestream
-                    int filesize = Integer.parseInt(communicationIn.readLine());
-                    int bytesRead;
-                    int currentTot = 0;
-                    byte[] bytearray = new byte[filesize];
+                // Variables for server input and stream objects that write to a local file
+                InputStream is = connectionSocket.getInputStream();
+                FileOutputStream fos = new FileOutputStream(getFile_Path("client_downloads", filename));
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-                    // Variables for server input and stream objects that write to a local file
-                    InputStream is = connectionSocket.getInputStream();
-                    FileOutputStream fos = new FileOutputStream(getFile_Path("client_downloads", filename));
-                    BufferedOutputStream bos = new BufferedOutputStream(fos);
+                // Read the first byte stream
+                bytesRead = is.read(bytearray, 0, bytearray.length);
+                currentTot = bytesRead;
+                char[] animationChars = new char[] { '|', '/', '-', '\\' };
+                int i = 0;
 
-                    // Read the first byte stream
-                    bytesRead = is.read(bytearray, 0, bytearray.length);
-                    currentTot = bytesRead;
-                    char[] animationChars =new char[]{'|','/','-','\\'};
-                    int i=0;
+                // Read the server's remaining byte streams in chunks
+                do {
+                    // Reads the bytestream and adds it to the byteArray
+                    bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
+                    System.out.print("Downloading: " + (Math.round(((currentTot + 0.0) / bytearray.length) * 100))
+                            + "% " + animationChars[i % 4] + "\r");
+                    i++;
+                    try {
+                        Thread.sleep((100));
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    // Updates the remaining bytes to be read
+                    if (bytesRead > 0)
+                        currentTot += bytesRead;
+                } while (bytesRead > 0);
 
-                    // Read the server's remaining byte streams in chunks
-                    do {
-                        // Reads the bytestream and adds it to the byteArray
-                        bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
-                        System.out.print("Downloading: "+ (Math.round(((currentTot+0.0)/bytearray.length)*100))+"% "+animationChars[i%4]+"\r");
-                        i++;
-                        try{
-                            Thread.sleep((100));
-                        }
-                        catch(InterruptedException ex){
-                            ex.printStackTrace();
-                        }
-                        // Updates the remaining bytes to be read
-                        if (bytesRead > 0)
-                            currentTot += bytesRead;
-                    } while (bytesRead > 0);
-                    System.out.println("Downloading: Done!          ");
+                // Let user know about the download's progress
+                System.out.println("Downloading: Done!          ");
 
-                    // Write the locally stored byte streams into client file
-                    bos.write(bytearray, 0, currentTot);
-                    bos.flush();
+                // Write the locally stored byte streams into client file
+                bos.write(bytearray, 0, currentTot);
+                bos.flush();
 
-                    // Close the filewriting outputstream object
-                    bos.close();
+                // Close the filewriting outputstream object
+                bos.close();
 
-                    // Send acknowledgement to server to synchronize their progress
-                    communicationOut.println("Client has downloaded file");
-                //} //IF THROW NOT WORKING
+                // Send acknowledgement to server to synchronize their progress
+                communicationOut.println("Client has downloaded file");
+                // } //IF THROW NOT WORKING
             }
 
         } catch (Exception e) {
@@ -320,19 +327,37 @@ private static void makequery(BufferedReader communicationIn){
         }
     }
 
-    public static File getFile(String subdirectory,String filename) {
+    /**
+     * Returns the file of a given file with a given subdirectory (underneath the
+     * root dir)
+     * 
+     * @param subdirectory
+     * @param filename
+     * @return File
+     */
+    public static File getFile(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory+ File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+                + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;
     }
 
-    public static String getFile_Path(String subdirectory,String filename) {
+    /**
+     * Returns the path of a given file with a given subdirectory (underneath the
+     * root dir)
+     * 
+     * @param subdirectory
+     * @param filename
+     * @return String
+     */
+    public static String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar + subdirectory + File.separatorChar+ filename; //subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+                + filename; // subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();
     }

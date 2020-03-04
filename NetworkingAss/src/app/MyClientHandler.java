@@ -7,60 +7,82 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class MyClientHandler implements Runnable {
+    // Declare variables for I/O, socket-connection, state-flags and user-input
+    // purposes
     private Socket myClient;
     private PrintWriter connectionOut;
     private PrintWriter communicationOut;
     private BufferedReader communicationIn;
     private OutputStream os;
-    private String myClientUname="";
+    private String myClientUname = "";
     private boolean close_unexpectedly = false;
-    // constructor
+
+    /**
+     * Constructor for the Client "Thread"
+     * 
+     * @param Socket This is the socket created for communication between the client
+     *               and server
+     */
     public MyClientHandler(Socket myClientSocket) throws IOException {
-        // assignes the communication socket to myClient.
+
         this.myClient = myClientSocket;
-        // connectionOut is a printWriter that will be use to send the client a new PORT
-        // number.
 
     }
 
     @Override
+    /**
+     * Runs the body of the communication thread
+     */
     public void run() {
         try {
+            // Creates objects for server/client communication, I/O and file writing
+            // purposes
             os = myClient.getOutputStream();
             connectionOut = new PrintWriter(os, true);
-
             communicationIn = new BufferedReader(new InputStreamReader(myClient.getInputStream()));
-            // communicationOut is a printWriter used to send any information to the client
-            // through the unique port.
             communicationOut = new PrintWriter(myClient.getOutputStream(), true);
 
             // Authentication
-            // user authentication
+            // Send username prompt to the client
             String userNameTxt = "Enter Username: ";
             communicationOut.println(userNameTxt);
+            // Read clients username response
             String uName = communicationIn.readLine();
+            // Send password prompt to the client
             String passwordTxt = "Enter Password: ";
             communicationOut.println(passwordTxt);
+            // Read clients password response
             String password = communicationIn.readLine();
+            // Checks if the password for the specified user matches the true password
+            // stored on the servers file system
             String checkPass = "";
             for (String i : MyServer.usersAndPass.keySet()) {
                 if (i.equals(uName)) {
                     checkPass = MyServer.usersAndPass.get(i);
                 }
             }
+            // If passwords are matching prompt user for commands
             if (checkPass.equals(password)) {
+                // Succesful login notification
                 communicationOut.println("success");
-                System.out.println("Client with address " + myClient.getRemoteSocketAddress().toString() + " has opened connection");
+                // Display succesful connection on the server side
+                System.out.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                        + " has opened connection");
                 // continous loop
-                myClientUname=uName;
+                myClientUname = uName;
+
+                // Flag represents communication status
+                // True: Communication is enabled
+                // False: Client quit the communication
                 boolean flag = true;
                 while (flag) {
-                    // reads what the client sent.
+                    // Send menu prompt to the client
                     String menu = "1) UPLOAD \n2) DOWNLOAD \n3) QUERY \n4) QUIT \n";
                     communicationOut.println(menu);
+                    // Read the user's selection
                     String request = communicationIn.readLine();
 
-                    // compare statement of what the client entered
+                    // Switch statement for every available command option
                     switch (request) {
                         case "1":
                         case "UPLOAD":
@@ -74,7 +96,6 @@ public class MyClientHandler implements Runnable {
                         case "3":
                         case "QUERY":
                             query();
-                            //System.out.println("Told me to QUERY");
                             break;
                         case "4":
                         case "QUIT":
@@ -85,25 +106,33 @@ public class MyClientHandler implements Runnable {
                             break;
                     }
                 }
-            } else {
+            }
+            // User authentication failed
+            else {
+
                 communicationOut.println("fail");
             }
-        } catch (IOException e) {}
-        catch(NullPointerException ex)
-        {
-            System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection unexpectly ");
-            close_unexpectedly = true;
+
         }
-         finally {
+
+        catch (IOException e) {
+        }
+
+        // Handles the exception in which the client closes the connection
+        catch (NullPointerException ex) {
+            System.err.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                    + " has closed connection unexpectly ");
+            close_unexpectedly = true;
+        } finally {
             try {
-                // closing bufferedReader and printWriter
+                // Close I/O objects
                 communicationIn.close();
                 communicationOut.close();
                 os.close();
-
-                if (!close_unexpectedly)
-                {
-                    System.err.println("Client with address "+myClient.getRemoteSocketAddress().toString()+" has closed connection");
+                // Display message to the server when specific client closes the connection
+                if (!close_unexpectedly) {
+                    System.err.println("Client with address " + myClient.getRemoteSocketAddress().toString()
+                            + " has closed connection");
                 }
             } catch (IOException e) {
             }
@@ -111,36 +140,10 @@ public class MyClientHandler implements Runnable {
 
     }
 
-    private void query(){
-
-
+    // Sends list of files to be displayed when client makes a "query" request
+    private void query() {
         communicationOut.println(MyServer.toStringAll());
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void upload_query() {
 
@@ -155,10 +158,9 @@ public class MyClientHandler implements Runnable {
                 // Setup to read the bytestream
                 int filesize = Integer.parseInt(communicationIn.readLine());
                 String password = communicationIn.readLine();
-                if (password.length()>0){
-                    MyServer.addToList(new FileObject(myClientUname, filename,password));
-                }
-                else{
+                if (password.length() > 0) {
+                    MyServer.addToList(new FileObject(myClientUname, filename, password));
+                } else {
                     MyServer.addToList(new FileObject(myClientUname, filename));
                 }
                 int bytesRead;
@@ -221,38 +223,32 @@ public class MyClientHandler implements Runnable {
             // Does not exist
             if (!transferFile.exists()) {
                 communicationOut.println("Error 404");
-            }
-            else{
+            } else {
                 communicationOut.println("Ok(200)");
-            
-            // File exists
-            // Send back to user
 
+                // File exists
+                // Send back to user
 
-            //SECURITY
-            
+                // SECURITY
+
                 boolean flag = false;
                 String pass = MyServer.getPass(filename);
-                if(pass.length()!=0){
+                if (pass.length() != 0) {
                     communicationOut.println("protected");
-                    String pwd = communicationIn.readLine(); //user inputted password
-                    if (pwd.equals(pass)){
+                    String pwd = communicationIn.readLine(); // user inputted password
+                    if (pwd.equals(pass)) {
                         communicationOut.println("valid");
                         flag = true;
-                    }
-                    else{
+                    } else {
                         communicationOut.println("invalid");
                         flag = false;
                     }
-                }
-                else{
+                } else {
                     communicationOut.println("public");
                     flag = true;
 
                 }
-                if(flag==true){
-
-                    
+                if (flag == true) {
 
                     // Sending file to client
                     communicationOut.println(transferFile.length());
@@ -287,20 +283,30 @@ public class MyClientHandler implements Runnable {
 
     }
 
+    /**
+     * @param filename
+     * @return File
+     */
     public File getFile(String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subdirectory = "NetworkingAss"+ File.separatorChar +"server_storage";
+        String subdirectory = "NetworkingAss" + File.separatorChar + "server_storage";
         String subDir_And_Filename = subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         File transferfile = filepath.toFile();
         return transferfile;
     }
 
-    public String getFile_Path(String subdirectory,String filename) {
+    /**
+     * @param subdirectory
+     * @param filename
+     * @return String
+     */
+    public String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar + subdirectory + File.separatorChar+ filename; //subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+                + filename; // subdirectory + File.separatorChar + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();
     }

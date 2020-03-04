@@ -23,61 +23,60 @@ public class MyServer {
     // hashmap to store usernames and passwords
     public static HashMap<String, String> usersAndPass;
     // LinkedList to store DataObjects
-    public static LinkedList<FileObject> list=new LinkedList<FileObject>();
+    public static LinkedList<FileObject> list = new LinkedList<FileObject>();
 
+    /**
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-        // establishes a connection on the connection port called
-        // connectionServerSocket.
+
+        // INITIAL DATA LOADS
+
+        // Loads User/Paswword hash map
         storeUsersAndPassword();
+        // Load the server files into linked list
         fillList();
 
+        // Establish connection
         ServerSocket connectionServerSocket = new ServerSocket(PORT);
 
+        // Create server shutdown handler
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                // System.out.print("\033[H\033[2J");  
-                // System.out.flush(); 
+                // System.out.print("\033[H\033[2J");
+                // System.out.flush();
                 System.out.print("\nServer was shutdown!\n");
-                
-            }
-            });
 
-        // continus loop
+            }
+        });
+
+        // Loop that constantly listens for client connections
         while (true) {
-            // connection socket is listening-- havent started communicating yet.
+            // Blocks here until client makes a connection request, then create connection
+            // socket
             Socket connectionSocket = connectionServerSocket.accept();
 
-            // creates a clientHandler for the current client passing in the
-            // connectionSocket as constructor
+            // Thread that handles client communication in a new thread by passing in
+            // communication socket
             MyClientHandler myClientThread = new MyClientHandler(connectionSocket);
-            // adds the client to the array list -- future use
+
+            // Adds the client to the array list -- future use
             myClients.add(myClientThread);
-            // executes the run method of the thread client
+
+            // Executes the thread used for client data transfer
             pool.execute(myClientThread);
         }
 
     }
 
-    // TEMPORARY get random method for now
-    public static String getRandom() {
-        String name = names[(int) (Math.random() * names.length)];
-
-        return name;
-
-    }
-
-    // synchronized method to assign a unique port number for every client that
-    // connects
-    public static synchronized int getComPort() {
-        comPort += 1;
-        return comPort;
-    }
-
-    // reading usersAndPasswords.txt
+    /**
+     * Loads the user names and passwords into hashmap
+     */
     public static void storeUsersAndPassword() {
         try {
             usersAndPass = new HashMap<String, String>();
-            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup","users.txt")));
+            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup", "users.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
                 String temp[] = line.split(" ");
@@ -89,16 +88,19 @@ public class MyServer {
         }
     }
 
+    /**
+     * Loads the server files stored on the machine in the linked list
+     */
+
     public static void fillList() {
         try {
-            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup","ExistingFiles.txt")));
+            Scanner sc = new Scanner(new FileReader(getFile_Path("server_setup", "ExistingFiles.txt")));
             while (sc.hasNext()) {
                 String line = sc.nextLine();
                 String temp[] = line.split("#");
-                if (temp.length==3){
+                if (temp.length == 3) {
                     list.add(new FileObject(temp[0], temp[1], temp[2]));
-                }
-                else{
+                } else {
                     list.add(new FileObject(temp[0], temp[1]));
                 }
             }
@@ -108,47 +110,77 @@ public class MyServer {
         }
     }
 
+    /**
+     * Returns the path of a given file with a given subdirectory (underneath the
+     * root dir)
+     * 
+     * @return String This returns the path
+     * @param String subdirectory
+     * @param String filename
+     */
 
     public static String getFile_Path(String subdirectory, String filename) {
         Path currentRelativePath = Paths.get("");
         Path currentDir = currentRelativePath.toAbsolutePath();
-        String subDir_And_Filename = "NetworkingAss"+ File.separatorChar +subdirectory + File.separatorChar + filename;
+        String subDir_And_Filename = "NetworkingAss" + File.separatorChar + subdirectory + File.separatorChar
+                + filename;
         Path filepath = currentDir.resolve(subDir_And_Filename);
         return filepath.toString();
     }
 
-    public static void writeList(){
+    /**
+     * Writes the new files downloaded during runtime to the persistent file system
+     */
+
+    public static void writeList() {
         try {
-            PrintWriter pw = new PrintWriter(new FileWriter(getFile_Path("server_setup","ExistingFiles.txt")));
+            PrintWriter pw = new PrintWriter(new FileWriter(getFile_Path("server_setup", "ExistingFiles.txt")));
             for (FileObject f : list) {
                 pw.println(f.toString());
             }
             pw.close();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 
-    public static void addToList(FileObject f){
+    /**
+     * Adds file objects to the linked used during runtime queries
+     * 
+     * @param f
+     */
+    public static void addToList(FileObject f) {
         list.add(f);
     }
 
-    public static String getPass(String filename){
+    /**
+     * Gets the password that used during the upload of a specified filename in the
+     * constructor
+     * 
+     * @param filename
+     * @return String
+     */
+    public static String getPass(String filename) {
         for (FileObject f : list) {
-            if(f.getFileName().equals(filename)){
+            if (f.getFileName().equals(filename)) {
                 return f.getPassword();
             }
         }
         return "";
     }
 
-    public static String toStringAll(){
+    /**
+     * Prints out the files to the user during runtime queries
+     * 
+     * @return String
+     */
+    public static String toStringAll() {
         String x = "";
         for (FileObject f : list) {
-            x+=f.prettyToString()+"###";
-            
+            x += f.prettyToString() + "###";
+
         }
         return x;
     }
